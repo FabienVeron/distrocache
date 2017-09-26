@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 
 //@SpringBootApplication
@@ -27,6 +28,26 @@ public class DistrocacheApplication {
 
         bart.setCacheAndReplicate("secret", 42);
         System.out.println("secret = " + lisa.getCache("secret"));
+
+        double delta = 0.10;
+        double closeCallPrice = 1.3;
+        double closePrice = 15;
+
+        Thread rtPrice = new Thread(() -> {
+            while (true) {
+                try {
+                    long waitingTime = ThreadLocalRandom.current().nextLong(300,1000);
+                    Thread.sleep(waitingTime);
+                    double price = ThreadLocalRandom.current().nextDouble(15,18);
+
+                    double currentPrice = closeCallPrice + delta * (closePrice - price);
+                    System.out.println("currentPrice = " + currentPrice);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        rtPrice.start();
 
         IntStream.range(0,50).forEach( (n) -> {
             new Thread(() -> {
